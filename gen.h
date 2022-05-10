@@ -39,7 +39,7 @@ int getVisited(int x, int y);
 
 void genMaze(struct Cell* start);
 
-void makeMaze(void);
+void makeMaze(char wallSym);
 
 int isEmpty(struct Stack *stk);
 

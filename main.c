@@ -26,13 +26,13 @@ enum terrain {
 int main(void){
 
 	SIZE_INPUT_MAX_LENGTH = 4;
-	crumbSym = '0';
+	crumbSym = '.';
 
 	getMaze("map.txt");
 
 	dfs(yStart, xStart);
 	addCrumbs();
-	
+
 	printMaze();
 
 	return 0;
@@ -49,25 +49,6 @@ void allocateMazeCP(){
 	mazeCP = malloc( rows * sizeof(int*));
 	for(int i=0; i< rows; i++){
 		mazeCP[i]= malloc( cols * sizeof(int*));
-	}
-}
-
-void getMCP(){
-	
-	allocateMazeCP();
-
-	for(int i=0; i<rows; i++){
-		for(int j=0; j<cols; j++){
-		
-			char terrain = maze[i][j];
-			if(terrain == wallSym){
-				mazeCP[i][j] = wall;
-			} else if (terrain == 'g'){
-				mazeCP[i][j] = goal;
-			} else {
-				mazeCP[i][j] = empty;
-			}
-		}
 	}
 }
 
@@ -123,7 +104,22 @@ void getMaze(char* mapfile){
 	}
 
 	fclose(file);
-	getMCP();
+
+	allocateMazeCP();
+
+	for(int i=0; i<rows; i++){
+		for(int j=0; j<cols; j++){
+		
+			char terrain = maze[i][j];
+			if(terrain == wallSym){
+				mazeCP[i][j] = wall;
+			} else if (terrain == 'g'){
+				mazeCP[i][j] = goal;
+			} else {
+				mazeCP[i][j] = empty;
+			}
+		}
+	}
 }
 
 void printMaze(){

@@ -7,7 +7,6 @@
 #include"gen.h"
 
 struct Cell** cellMatrix;
-int size;
 int SEED;
 
 int hSize;
@@ -15,33 +14,24 @@ int wSize;
 
 int main(void){
 
+	char WALL_SYMBOL = '#';
+
 	allocateCellMatrix();
-	genMaze(&(cellMatrix[0][0]));
-	
+	genMaze(&(cellMatrix[1][1]));
+	makeMaze(WALL_SYMBOL);	
+
 	return 0;
 }
 
-void setSize(){
-	size = 0;
-	printf("Enter A Size For The Maze(Each pixel is a 3x3 block): ");
-	scanf("%d", &size);
-}
+void allocateCellMatrix(void){
 
-void setSizeV(){
 	hSize = 0;
 	wSize = 0;
 	printf("Enter A Height For The Maze(Each pixel is a 3x3 block): ");
 	scanf("%d", &hSize);
 	printf("Enter A Width For The Maze(Each pixel is a 3x3 block): ");
 	scanf("%d", &wSize);
-}
-
-
-void allocateCellMatrix(void){
-
-	//setSize();
-	setSizeV();
-
+	
 	cellMatrix = malloc( hSize * sizeof(struct Cell*) );
 
 	for(int i=0; i< wSize; i++){
@@ -64,7 +54,7 @@ void allocateCellMatrix(void){
 }
 
 void printCell(int x,int y){
-	if(x == -1 | y==-1){
+	if(x == -1 | y==-1){ // print whole maze
 		
 		for(int i=0;i<hSize;i++){
 			for(int j=0;j<wSize;j++){
@@ -87,6 +77,7 @@ void printCell(int x,int y){
 				printf("\n\n");
 			}
 		}
+		return;
 }
 	
 int removeTop(struct Cell* cell){
@@ -266,13 +257,9 @@ void genMaze(struct Cell* start){
 			}
 		}
 	}
-
-	makeMaze();
 }
 
-void makeMaze(){
-
-	printf("\n\n --TEST MAZE v1 --\n");
+void makeMaze(char sym){
 
 	FILE *pFile;
 	pFile = fopen("newMap.txt", "w");
@@ -286,71 +273,60 @@ void makeMaze(){
 				case 1:
 					for(int j=0;j<wSize;j++){
 						if (cellMatrix[i][j].walls[0] == '1'){
-							printf("+++");
-							fprintf(pFile,"+++");
+							fprintf(pFile,"%c%c%c",sym,sym,sym);
 						} else {
-							printf("+ +");
-							fprintf(pFile,"+ +");
+							fprintf(pFile,"%c %c",sym,sym);
 						}
 					}
-					printf("\n");
 					fprintf(pFile,"\n");
 
 					break;
 				case 2:
 					for(int j=0;j<wSize;j++){
 							if (cellMatrix[i][j].walls[3] == '1'){
-								printf("+");
-								fprintf(pFile,"+");
+								fprintf(pFile,"%c",sym);
 
 							} else {
-								printf(" ");
 								fprintf(pFile," ");
 
 							}
 							if (cellMatrix[i][j].walls[0] == '0' | cellMatrix[i][j].walls[1]== '0'| cellMatrix[i][j].walls[2]== '0'| cellMatrix[i][j].walls[3]== '0'){
-								printf(" ");
 								fprintf(pFile," ");
 
 							} else {
-								printf("+");
-								fprintf(pFile,"+");
+								fprintf(pFile,"%c",sym);
 
 							}
 							if (cellMatrix[i][j].walls[1] == '1'){
-								printf("+");
-								fprintf(pFile,"+");
+								fprintf(pFile,"%c",sym);
 
 							} else {
-								printf(" ");
 								fprintf(pFile," ");
 
 							}
 						}
-						printf("\n");
 						fprintf(pFile,"\n");
 
 						break;
 				case 3:
 					for(int j=0;j<wSize;j++){
 							if (cellMatrix[i][j].walls[2] == '1'){
-								printf("+++");
-								fprintf(pFile,"+++");
+								fprintf(pFile,"%c%c%c",sym,sym,sym);
 
 							} else {
-								printf("+ +");
-								fprintf(pFile,"+ +");
+								fprintf(pFile,"%c %c",sym,sym);
 							}
 						}
-						printf("\n");
 						fprintf(pFile,"\n");
 						break;
 			}
 		}
 	}
-
+	fprintf(pFile,"Place an 's' and a 'g' in the maze to set its start and goal.\n ");
+	fclose(pFile);
 }
 
+//STRUCT STACK METHOSD
 int isEmpty( struct Stack *stk ){
 	
 	int length = (stk->length);
@@ -384,5 +360,7 @@ struct Cell* pop(struct Stack *stk){
 
 		struct Cell *cell = (*node).data;
 		return cell;
+	} else {
+		exit(1);
 	}
 }
