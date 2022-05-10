@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "main.h"
 
 char** maze;
 int** mazeCP;
@@ -11,12 +12,29 @@ int cols;
 int yStart;
 int xStart;
 
+int SIZE_INPUT_MAX_LENGTH;
+char crumbSym;
+char wallSym;
+
 enum terrain {
 	empty,
 	wall,
 	goal,
 	crumb
 };
+
+int main(void){
+
+	SIZE_INPUT_MAX_LENGTH = 4;
+	crumbSym = '#';
+	
+
+	getMaze("map.txt");
+	dfs(yStart, xStart);
+	printMazeCP();
+	addCrumbs();
+	return 0;
+}
 
 void allocateMaze(){
 	maze = malloc( rows * sizeof(char*));
@@ -26,46 +44,63 @@ void allocateMaze(){
 }
 
 void allocateMazeCP(){
-	mazeCP = malloc( rows * sizeof(char*));
+	mazeCP = malloc( rows * sizeof(int*));
 	for(int i=0; i< rows; i++){
-		mazeCP[i]= malloc( cols * sizeof(char*));
+		mazeCP[i]= malloc( cols * sizeof(int*));
+	}
+}
+
+void getMCP(){
+	
+	allocateMazeCP();
+
+	for(int i=0; i<rows; i++){
+		for(int j=0; j<cols; j++){
+		
+			char terrain = maze[i][j];
+			if(terrain == wallSym){
+				mazeCP[i][j] = wall;
+			} else if (terrain == 'g'){
+				mazeCP[i][j] = goal;
+			} else {
+				mazeCP[i][j] = empty;
+			}
+		}
 	}
 }
 
 void getMaze(char* mapfile){
 	
 	char c;
-	char C_rows[4] = {'\0'};
+
+	char stringRows[SIZE_INPUT_MAX_LENGTH];
+	char stringCols[SIZE_INPUT_MAX_LENGTH];
 	int r_i = 0;
-	char C_cols[4] = {'\0'};
 	int c_i = 0;
 
 	FILE* file = fopen(mapfile, "r");
-	
 	if (file){
 		
 		int flag = 0;
-
 		while( (c = getc(file)) != EOF) {
 			if( c == '\n'){
 				break;
 			} else if ( c == ','){
 				flag = 1;		
 			} else if (!flag){
-				C_rows[r_i] = c;
+				stringRows[r_i] = c;
 				r_i++;
 			} else {
-				C_cols[c_i] = c;
+				stringCols[c_i] = c;
 				c_i++;
 			}
 		}
 	}
-
-	rows = atoi(C_rows);
-	cols = atoi(C_cols);
+	rows = atoi(stringRows);
+	cols = atoi(stringCols);
 
 	allocateMaze();
-
+	int gotWalls = 0;
 	for(int i=0;i<rows;i++){
 		for(int j=0;j<cols;j++){
 			c = getc(file);
@@ -76,38 +111,20 @@ void getMaze(char* mapfile){
 			if ( c == 's' || c == 'S'){
 				yStart = i;
 				xStart = j;
+			} else if ( (!gotWalls) &&(c != ' ') && (c != 'g') ){
+				gotWalls = 1;
+				wallSym = c;
 			}
 
 			maze[i][j] = c;
 		}
 	}
 
-
 	fclose(file);
 
+	getMCP();
+
 }
-
-void getMCP(){
-	
-	allocateMazeCP();
-
-	for(int i=0; i<rows; i++){
-		for(int j=0; j<cols; j++){
-			switch(maze[i][j]){
-				case '+':
-					mazeCP[i][j] = wall;
-					break;
-				case 'g':
-					mazeCP[i][j] = goal;
-					break;
-				default:
-					mazeCP[i][j] = empty;
-					break;
-			}
-		}
-	}
-}
-
 
 void printMaze(){
 	
@@ -120,7 +137,7 @@ void printMaze(){
 		printf("\n");
 	}
 
-	printf("X-START: %d, Y-START: %d\n\n", xStart, yStart); 
+	printf(" X-START: %d, Y-START: %d\n", xStart, yStart); 
 }
 
 void printMazeCP(){
@@ -128,25 +145,19 @@ void printMazeCP(){
 	printf("\n");
 	for(int i=0;i<rows;i++){
 		for (int j=0;j<cols;j++){
-			printf("%d ", mazeCP[i][j]);
+			if(mazeCP[i][j] == 1){
+				printf("0 ");
+			} else if (mazeCP[i][j] == 0){
+				printf("1 ");
+			} else {
+				printf("%d ", mazeCP[i][j]);
+
+			}
+			//printf("%d ", mazeCP[i][j]);
 		}
 		printf("\n");
 	}
 	printf("\n");
-}
-
-void addCrumbs(){
-	for(int i=0; i<rows; i++){
-		for(int j=0; j<cols; j++){
-
-			if (maze[i][j] != 's'){
-				if( mazeCP[i][j] == crumb ){
-					maze[i][j] = '-';
-				}
-			}
-			
-		}
-	}
 }
 
 int dfs(int row, int col){
@@ -183,15 +194,17 @@ int dfs(int row, int col){
 	return 0;
 }
 
-int main(void){
+void addCrumbs(){
+	for(int i=0; i<rows; i++){
+		for(int j=0; j<cols; j++){
 
-	getMaze("map.txt");
-	printMaze();	
-	getMCP();	
-	//printMazeCP();
-	dfs(yStart, xStart);
-	//printMazeCP();
-	addCrumbs();
+			if (maze[i][j] != 's'){
+				if( mazeCP[i][j] == crumb ){
+					maze[i][j] = crumbSym;
+				}
+			}
+			
+		}
+	}
 	printMaze();
-	return 0;
 }

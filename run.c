@@ -36,18 +36,24 @@ int main(void){
 		}
 	}
 	
+	int flag1 = 0;
 	if(replace){
+		flag1 = 1;
 		remove("map.txt");
 		rename("newMap.txt", "map.txt");
 	}else if(noMap) {
+		flag1 = 1;
 		printf("\n map.txt created \n");
 		rename("newMap.txt", "map.txt");
 	} else {
 		printf("newMap.txt created\n");
 	}
 
-		
+	if (flag1){
+
+		execl("/usr/bin/vim", "/usr/bin/vim", "map.txt", NULL);
+		wait(NULL); // TO BE FIXED
+		execl("MAIN", "MAIN", ">output.txt", NULL);
+	}
 	return 0;
-
-
 }
