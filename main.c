@@ -26,13 +26,15 @@ enum terrain {
 int main(void){
 
 	SIZE_INPUT_MAX_LENGTH = 4;
-	crumbSym = '#';
-	
+	crumbSym = '0';
 
 	getMaze("map.txt");
+
 	dfs(yStart, xStart);
-	printMazeCP();
 	addCrumbs();
+	
+	printMaze();
+
 	return 0;
 }
 
@@ -121,9 +123,7 @@ void getMaze(char* mapfile){
 	}
 
 	fclose(file);
-
 	getMCP();
-
 }
 
 void printMaze(){
@@ -206,5 +206,4 @@ void addCrumbs(){
 			
 		}
 	}
-	printMaze();
 }

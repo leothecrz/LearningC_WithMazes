@@ -3,34 +3,53 @@
 #include<stddef.h>
 #include<stdlib.h>
 #include<time.h>
-#include"stack.h"
+
 #include"gen.h"
 
 struct Cell** cellMatrix;
 int size;
 int SEED;
 
+int hSize;
+int wSize;
+
 int main(void){
 
-	setSize();
 	allocateCellMatrix();
-	//printCell(-1,-1);
 	genMaze(&(cellMatrix[0][0]));
-	makeMaze();
-
+	
 	return 0;
 }
 
+void setSize(){
+	size = 0;
+	printf("Enter A Size For The Maze(Each pixel is a 3x3 block): ");
+	scanf("%d", &size);
+}
+
+void setSizeV(){
+	hSize = 0;
+	wSize = 0;
+	printf("Enter A Height For The Maze(Each pixel is a 3x3 block): ");
+	scanf("%d", &hSize);
+	printf("Enter A Width For The Maze(Each pixel is a 3x3 block): ");
+	scanf("%d", &wSize);
+}
+
+
 void allocateCellMatrix(void){
 
-	cellMatrix = malloc( size * sizeof(struct Cell*) );
+	//setSize();
+	setSizeV();
 
-	for(int i=0; i< size; i++){
-		cellMatrix[i]= malloc( size * sizeof(struct Cell) );
+	cellMatrix = malloc( hSize * sizeof(struct Cell*) );
+
+	for(int i=0; i< wSize; i++){
+		cellMatrix[i]= malloc( wSize * sizeof(struct Cell) );
 	}
 
-	for(int i=0; i< size; i++){
-		for(int j=0; j< size; j++){
+	for(int i=0; i< hSize; i++){
+		for(int j=0; j< wSize; j++){
 
 			(cellMatrix[i][j]).y = i;
 			(cellMatrix[i][j]).x = j;
@@ -47,8 +66,8 @@ void allocateCellMatrix(void){
 void printCell(int x,int y){
 	if(x == -1 | y==-1){
 		
-		for(int i=0;i<size;i++){
-			for(int j=0;j<size;j++){
+		for(int i=0;i<hSize;i++){
+			for(int j=0;j<wSize;j++){
 				struct Cell active = cellMatrix[i][j];
 				printf("Y: %d, X: %d, Visited: %d| ", active.y, active.x, active.visited);
 				for(int k=0;k<4;k++){
@@ -59,7 +78,7 @@ void printCell(int x,int y){
 			}
 		}
 	}else{
-		if(x < size && y < size){
+		if(x < wSize && y < hSize){
 			struct Cell active = cellMatrix[x][y];
 			printf("\nY: %d, X: %d, Visited: %d,\n", active.y, active.x, active.visited);
 			for(int k=0;k<4;k++){
@@ -70,12 +89,6 @@ void printCell(int x,int y){
 		}
 }
 	
-void setSize(){
-	size = 0;
-	printf("Enter a size for the maze: ");
-	scanf("%d", &size);
-}
-
 int removeTop(struct Cell* cell){
 
 		if((*cell).y == 0){
@@ -96,7 +109,7 @@ int removeTop(struct Cell* cell){
 
 int removeRight(struct Cell* cell){
 
-		if((*cell).x == (size-1)){
+		if((*cell).x == (wSize-1)){
 			return 0;
 		} else{
 			if( (cellMatrix[((*cell).y)][((*cell).x)+1]).visited == 1 ){
@@ -114,7 +127,7 @@ int removeRight(struct Cell* cell){
 
 int removeBottom(struct Cell* cell){
 
-		if((*cell).y == (size-1)){
+		if((*cell).y == (hSize-1)){
 			return 0;
 		} else{
 			if( (cellMatrix[((*cell).y)+1][((*cell).x)]).visited == 1 ){
@@ -153,7 +166,7 @@ int getVisited(int x, int y){
 
 	if (x == 0){
 		count += cellMatrix[y][x+1].visited;
-	} else if (x == (size-1) ){
+	} else if (x == (wSize-1) ){
 		count += cellMatrix[y][x-1].visited;
 	} else {
 		count += (	cellMatrix[y][x+1].visited + cellMatrix[y][x-1].visited	);
@@ -161,7 +174,7 @@ int getVisited(int x, int y){
 
 	if (y == 0){
 		count += cellMatrix[y+1][x].visited;
-	} else if (y == (size-1) ){
+	} else if (y == (hSize-1) ){
 		count += cellMatrix[y-1][x].visited;
 	} else {
 		count += (	cellMatrix[y+1][x].visited + cellMatrix[y-1][x].visited	);
@@ -176,28 +189,20 @@ void genMaze(struct Cell* start){
 	struct Stack traceback = {NULL, 0};
 	SEED = time(0);
 	(*start).visited = 0;
-
 	push(&traceback, start);
-	printf("PUSH-size: %d,\n", traceback.length);
 
 	while(!isEmpty(&traceback)){
 		SEED++;
 
-		struct Cell* active = pop(&traceback);
-		printf("POP-size: %d,\n", traceback.length);
-
-		
+		struct Cell* active = pop(&traceback);		
 		int x = (*active).x;
 		int y = (*active).y;
 		int visitedCount = getVisited(x,y);
-
-		printf("visitedCount: %d\n", visitedCount);
 
 		if(visitedCount > 0){
 			SEED++;
 
 			push(&traceback, active);
-			printf("Push-size: %d,\n", traceback.length);
 
 			srand(SEED);
 
@@ -205,7 +210,6 @@ void genMaze(struct Cell* start){
 			int num;
 			while(!ran){
 				num = (rand() % 4) + 1;
-				printf("Switch: %d\n", num);
 				struct Cell topCell;
 				switch(num){
 						case 1:
@@ -214,7 +218,6 @@ void genMaze(struct Cell* start){
 								ran = 1;
 								//topCell=(cellMatrix[(*active).y-1][(*active).x]);
 								push(&traceback, &(cellMatrix[(*active).y-1][(*active).x]));
-								printf("push-size: %d,\n", traceback.length);
 
 								(cellMatrix[(*active).y -1][(*active).x]).visited = 0;
 
@@ -228,7 +231,6 @@ void genMaze(struct Cell* start){
 								ran = 1;
 								//topCell=cellMatrix[(*active).y][(*active).x+1];
 								push(&traceback, &(cellMatrix[(*active).y][(*active).x+1]));								
-								printf("push-size: %d,\n", traceback.length);
 
 								(cellMatrix[(*active).y][(*active).x +1]).visited = 0;
 
@@ -242,7 +244,6 @@ void genMaze(struct Cell* start){
 								ran = 1;
 								//topCell=cellMatrix[(*active).y+1][(*active).x];
 								push(&traceback, &(cellMatrix[(*active).y+1][(*active).x]));								
-								printf("push-size: %d,\n", traceback.length);
 
 								(cellMatrix[(*active).y +1][(*active).x]).visited = 0;
 
@@ -256,7 +257,6 @@ void genMaze(struct Cell* start){
 								ran = 1;
 								//topCell=cellMatrix[(*active).y][(*active).x-1];
 								push(&traceback, &(cellMatrix[(*active).y][(*active).x-1]));								
-								printf("push-size: %d,\n", traceback.length);
 
 								(cellMatrix[(*active).y][(*active).x-1]).visited = 0;
 
@@ -265,10 +265,9 @@ void genMaze(struct Cell* start){
 				}
 			}
 		}
-		printCell(x,y);
-
 	}
 
+	makeMaze();
 }
 
 void makeMaze(){
@@ -277,15 +276,15 @@ void makeMaze(){
 
 	FILE *pFile;
 	pFile = fopen("newMap.txt", "w");
-	fprintf(pFile,"%d,%d \n", (size*3), (3*size) );
+	fprintf(pFile,"%d,%d \n", (hSize*3), (3*wSize) );
 
-	for(int i=0;i<size;i++){
+	for(int i=0;i<hSize;i++){
 		int k=0;
 		while(k!=3){
 			k++;
 			switch(k){
 				case 1:
-					for(int j=0;j<size;j++){
+					for(int j=0;j<wSize;j++){
 						if (cellMatrix[i][j].walls[0] == '1'){
 							printf("+++");
 							fprintf(pFile,"+++");
@@ -299,7 +298,7 @@ void makeMaze(){
 
 					break;
 				case 2:
-					for(int j=0;j<size;j++){
+					for(int j=0;j<wSize;j++){
 							if (cellMatrix[i][j].walls[3] == '1'){
 								printf("+");
 								fprintf(pFile,"+");
@@ -333,7 +332,7 @@ void makeMaze(){
 
 						break;
 				case 3:
-					for(int j=0;j<size;j++){
+					for(int j=0;j<wSize;j++){
 							if (cellMatrix[i][j].walls[2] == '1'){
 								printf("+++");
 								fprintf(pFile,"+++");
@@ -350,4 +349,40 @@ void makeMaze(){
 		}
 	}
 
+}
+
+int isEmpty( struct Stack *stk ){
+	
+	int length = (stk->length);
+	
+	if ( (length) > 0 ){
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+void push( struct Stack *stk, struct Cell *cell ){
+
+	struct Node *newNode;
+	newNode = (struct Node*) malloc(sizeof(struct Node));
+
+	(*newNode).next = ((*stk).top);
+	(*newNode).data = cell;
+
+	(*stk).top = newNode;
+	(*stk).length += 1;
+
+}
+
+struct Cell* pop(struct Stack *stk){
+
+	if (!isEmpty(stk)){
+		struct Node *node = (stk)->top;
+		(*stk).length -= 1;
+		(*stk).top = (*node).next;
+
+		struct Cell *cell = (*node).data;
+		return cell;
+	}
 }

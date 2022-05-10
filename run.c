@@ -50,10 +50,8 @@ int main(void){
 	}
 
 	if (flag1){
-
-		execl("/usr/bin/vim", "/usr/bin/vim", "map.txt", NULL);
-		wait(NULL); // TO BE FIXED
-		execl("MAIN", "MAIN", ">output.txt", NULL);
+		execl("EDIT", "EDIT",  NULL);
 	}
+	
 	return 0;
 }

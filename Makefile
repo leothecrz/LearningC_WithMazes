@@ -1,7 +1,7 @@
 
 CC=cc
 
-all: main gen run
+all: main gen run edit
 
 main: main.o
 	$(CC) main.c -o MAIN
@@ -9,14 +9,17 @@ main: main.o
 mainDebug: main .o
 	$(CC) -g main.c MAIN
 
-gen: stack.o gen.o
-	$(CC) stack.o gen.o -o GEN
+gen: gen.o
+	$(CC) gen.o -o GEN
 
-genDebug: stack.o gen.o
-	$(CC) -g stack.c gen.c -o GEN  
+genDebug: gen.o
+	$(CC) -g gen.c -o GEN  
 
-run: gen main
+edit: edit.o
+	$(CC) edit.c -o EDIT
+
+run: run.o gen main
 	$(CC) run.c -o RUN
 
 clean:
-	rm *.o MAIN GEN RUN
+	rm *.o MAIN GEN RUN EDIT
