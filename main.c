@@ -33,7 +33,7 @@ int main(void){
 	dfs(yStart, xStart);
 	addCrumbs();
 
-	printMaze();
+	printMaze(1);
 
 	return 0;
 }
@@ -122,18 +122,27 @@ void getMaze(char* mapfile){
 	}
 }
 
-void printMaze(){
-	
-	printf("\nROWS: %d, COLS:%d \n",rows, cols);
+void printMaze(int i){
 
-	for(int i=0;i<rows;i++){
-		for (int j=0;j<cols;j++){
-			printf("%c ", maze[i][j]);
+	FILE* file = fopen("output.txt", "w");
+	if (file){	
+		if(i) printf("\nROWS: %d, COLS:%d \n",rows, cols);
+		fprintf(file, "\nROWS: %d, COLS:%d \n",rows, cols);
+
+		for(int i=0;i<rows;i++){
+			for (int j=0;j<cols;j++){
+				if(i)printf("%c ", maze[i][j]);
+				fprintf(file,"%c ", maze[i][j]);
+			}
+			if(i) printf("\n");
+			fprintf(file,"\n");
+
 		}
-		printf("\n");
-	}
 
-	printf(" X-START: %d, Y-START: %d\n", xStart, yStart); 
+		if(i) printf(" X-START: %d, Y-START: %d\n", xStart, yStart); 
+		fprintf(file," X-START: %d, Y-START: %d\n", xStart, yStart);
+
+	}
 }
 
 void printMazeCP(){

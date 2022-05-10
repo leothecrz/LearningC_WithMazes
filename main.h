@@ -7,7 +7,7 @@ void getMaze(char* mapfile);
 
 void getMCP();
 
-void printMaze(void);
+void printMaze(int flag);
 
 void printMazeCP(void);
 
