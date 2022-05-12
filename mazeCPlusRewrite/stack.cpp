@@ -1,41 +1,40 @@
-class Cell{
-    public:
-        int x;
-        int y;
+#include "stack.h"
+#include <stdlib.h>
 
-        int visited;
-        int walls[4];
-        
-        Cell(int a, int b){
-            x = a;
-            y = b;
-            visited = 1;
-            for(int i=0;i<4;i++){
-                walls[i] = 0;
-            }
-        }
+Stack::Stack(){
+    this->count = 0;
+    this->top = 0;
+}
 
-};
-/*
-class Node{
-    public:
-        Cell* data;
-        Node* next;
+int Stack::isEmpty(void){
 
-        Node(Cell* data, Node* next){
-            this->data = data;
-            this->next = next;
-        }
-};
-*/
-class Stack{
-    //NODE CLASS WILL BE TURNED INTO Internal STRUCT
-    public:
-     int size;
-     Node* top;
+    return (!( (this->count)>0) ) ;
 
-     Stack(){
-        this->size = 0;
-        this->top = NULL;
-     }
-};
+}
+
+void Stack::push(struct Cell* cell){
+
+    struct Node* p_node;
+    p_node = (struct Node *) malloc(sizeof(struct Node));
+
+    (*p_node).next = this->top;
+    (*p_node).data = cell;
+
+    this->top = p_node;
+    this->count++;
+
+}
+
+struct Cell* Stack::pop(void){
+    if(!(this->isEmpty())){
+        struct Node* active = this->top;
+        this->count--;
+        this->top = active->next;
+
+        return active->data;
+
+    } else{
+        exit(1);
+    }
+
+}
