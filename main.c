@@ -122,24 +122,24 @@ void getMaze(char* mapfile){
 	}
 }
 
-void printMaze(int i){
+void printMaze(int k){
 
 	FILE* file = fopen("output.txt", "w");
 	if (file){	
-		if(i) printf("\nROWS: %d, COLS:%d \n",rows, cols);
+		if(k) printf("\nROWS: %d, COLS:%d \n",rows, cols);
 		fprintf(file, "\nROWS: %d, COLS:%d \n",rows, cols);
 
 		for(int i=0;i<rows;i++){
 			for (int j=0;j<cols;j++){
-				if(i)printf("%c ", maze[i][j]);
+				if(k)printf("%c ", maze[i][j]);
 				fprintf(file,"%c ", maze[i][j]);
 			}
-			if(i) printf("\n");
+			if(k) printf("\n");
 			fprintf(file,"\n");
 
 		}
 
-		if(i) printf(" X-START: %d, Y-START: %d\n", xStart, yStart); 
+		if(k) printf(" X-START: %d, Y-START: %d\n", xStart, yStart); 
 		fprintf(file," X-START: %d, Y-START: %d\n", xStart, yStart);
 
 	}
